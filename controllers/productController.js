@@ -1,10 +1,45 @@
 const Product = require("../models/Product");
 
-const createProduct = (req, res) => {
-    return res.status(200).json({
-        status: true,
-        message: "API working",
-    });
+const createProduct = async (req, res) => {
+    try {
+        const { title, image, rating, price, description } = req.body;
+        const payload = {
+            user: req.user.id,
+            title,
+            image,
+            rating,
+            price,
+            description,
+        };
+        let product = new Product(payload);
+        await product.save();
+
+        return res.status(201).json({
+            status: true,
+            message: "Product created successfully!",
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 400).json({
+            status: false,
+            message: error.message || "Something went wrong!",
+        });
+    }
 };
 
-module.exports = { createProduct };
+const getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find();
+        return res.status(200).json({
+            status: true,
+            message: "Products fetched successfully!",
+            data: products,
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 400).json({
+            status: false,
+            message: error.message || "Something went wrong!",
+        });
+    }
+};
+
+module.exports = { createProduct, getAllProducts };
