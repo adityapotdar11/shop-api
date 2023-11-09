@@ -42,4 +42,20 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getAllProducts };
+const getSingleProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        return res.status(200).json({
+            status: true,
+            message: "Product fetched successfully!",
+            data: product,
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 400).json({
+            status: false,
+            message: error.message || "Something went wrong!",
+        });
+    }
+};
+
+module.exports = { createProduct, getAllProducts, getSingleProduct };
