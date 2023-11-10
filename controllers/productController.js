@@ -97,9 +97,35 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const deleteProduct = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        let product = await Product.findById(id).populate("user");
+        if (!product) {
+            throw new Error("Product not found!");
+        }
+        if (product.user.id !== req.user.id) {
+            throw new Error("You cannot delete this product!");
+        }
+        await Product.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            status: true,
+            message: "Product deleted successfully!",
+        });
+    } catch (error) {
+        return res.status(error.statusCode || 400).json({
+            status: false,
+            message: error.message || "Something went wrong!",
+        });
+    }
+};
+
 module.exports = {
     createProduct,
     getAllProducts,
     getSingleProduct,
     updateProduct,
+    deleteProduct,
 };
