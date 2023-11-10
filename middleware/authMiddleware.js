@@ -14,7 +14,14 @@ const authMiddleware = async (req, res, next) => {
 
     try {
         const decoded = JWT.verify(token, jwtSecret);
-        req.user = decoded.user;
+        let user = await User.findById(decoded.user.id);
+        if (!user) {
+            return res.status(401).json({
+                status: false,
+                message: "Access denied!",
+            });
+        }
+        req.user = user;
         next();
     } catch (err) {
         return res.status(401).json({
